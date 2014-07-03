@@ -22,4 +22,16 @@ class Player(object):
 	def __init__(self, name, balance=100):
 		self.name = name
 		self.balance = balance
+
+class NPC(Player):
+	"""Subclass of Player. Needs to make basic decisions
+	based on ratios, does not use input, performs actions
+	based on code-only"""
+
+class PC(Player):
+	"""Subclass of Player. Player is a human player, and needs to be presented 
+	with each decision and perform that action using some type of input.
+	"""
+	def __init__(self):
+		self.sitting_out = False
 		
