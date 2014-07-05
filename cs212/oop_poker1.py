@@ -15,16 +15,38 @@ class Table(object):
 		self.pot = 0
 		self.cards = cards
 		self.round = 1
+
 		self.seats = {} # Dictionary of player locations
 		for i in range(self.positions):
 			self.seats[i] = None
 
+	def deal(self):
+		for seat in self.seats:
+			if self.seats[seat] == None:
+				print 'Skipping seat: %d' % seat
+			else:
+				self.seats[seat].cards.append(self.cards.pop())
+				self.seats[seat].cards.append(self.cards.pop())
 	def display_open_seats(self):
 		open_seats = []
 		for i in self.seats:
 			if self.seats[i] == None:
 				open_seats.append(i)
 		return 'Open seats at the following positions:\n%s' % open_seats
+	def seat_math(self, position, change):
+		"""Given a position, and the change in position returns 
+		a new position at the table. Needed to go around the table.
+		"""
+		max_pos = max(self.seats.keys())
+		min_pos = min(self.seats.keys())
+		pos_new = position + change
+		if pos_new > max_pos:
+			# if pos_new = 8 -----> 0 == -1 + (pos_new - max_pos)
+			return -1 + (pos_new - max_pos)
+		elif pos_new < min_pos:
+			return max_pos + 1 + pos_new
+		else:
+			return pos_new
 
 	def display(self):
 		print 'Table Status'
@@ -33,35 +55,47 @@ class Table(object):
 		print '='*63
 		seat_names = []
 		seat_balances = []
+		seat_cards = []
 
 		seat_number = ''
 		seat_type = ''
 		for key in self.seats.keys():
+			#Display for seat numbers
 			if seat_number == '':
 				seat_number += 'Seat:' + str(key)
 			else:
 				seat_number += '\tSeat:' + str(key)
 
+			# Display for table positions (Dealer button, etc)
 			if key == self.dealer_pos:
 				seat_type += 'D\t'
-			elif key == self.dealer_pos - 1:
+			elif key == self.seat_math(self.dealer_pos, -1):
 				seat_type += 'BB\t'
-			elif key == self.dealer_pos - 2:
+			elif key == self.seat_math(self.dealer_pos, -2):
 				seat_type += 'LB\t'
 			else:
 				seat_type += '\t'
+
+			
 		for index, seat in enumerate(self.seats):
 			if self.seats[seat]:
 				seat_names.append(self.seats[seat].name)
 				seat_balances.append(str(self.seats[seat].balance))
+				if self.seats[seat].cards:
+					player_cards = []
+					for card in self.seats[seat].cards:
+						player_cards.append(card.simple_name_card(card.suit, card.rank))
+					seat_cards.append('-'.join(player_cards))
 			else:
 				seat_names.append('------')
 				seat_balances.append('0')
-		#print '\t'.join(str(self.seats.keys()))
+				seat_cards.append('--')
+
 		print seat_number
 		print seat_type
 		print '\t'.join(seat_names)
 		print '\t'.join(seat_balances)
+		print '\t'.join(seat_cards)
 
 
 class Player(object):
@@ -73,6 +107,7 @@ class Player(object):
 		self.name = name
 		self.balance = balance
 		self.sitting_out = True
+		self.cards = []
 
 	def sit_in(self, table, seat):
 		table.seats[seat] = self
@@ -114,13 +149,26 @@ class Card(object):
 							11:'Jack',
 							12:'Queen',
 							13:'King'}
+		self.rank_letters = {1 : 'A',
+							2: '2',
+							3: '3',
+							4: '4',
+							5: '5',
+							6: '6',
+							7: '7',
+							8: '8',
+							9: '9', 
+							10:'T',
+							11:'J',
+							12:'Q',
+							13:'K'}
 
 	def name_card(self, suit, rank):
 		"""Returns the card in written form ie. Ace of Diamonds"""
 		return '%s of %s' % (self.rank_names[rank], self.suit_names[suit])
 
 	def simple_name_card(self, suit, rank):
-		return str(rank) + suit
+		return self.rank_letters[rank] + suit
 
 class Deck(object):
 	"""Standard deck of playing cards"""
