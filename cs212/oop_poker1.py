@@ -28,20 +28,38 @@ class Table(object):
 
 	def display(self):
 		print 'Table Status'
-		print '-'*60
+		print '-'*63
 		print 'Round: %d \t Pot: %d \t' % (self.round, self.pot)
-		print '='*60
+		print '='*63
 		seat_names = []
 		seat_balances = []
 
+		seat_number = ''
+		seat_type = ''
+		for key in self.seats.keys():
+			if seat_number == '':
+				seat_number += 'Seat:' + str(key)
+			else:
+				seat_number += '\tSeat:' + str(key)
+
+			if key == self.dealer_pos:
+				seat_type += 'D\t'
+			elif key == self.dealer_pos - 1:
+				seat_type += 'BB\t'
+			elif key == self.dealer_pos - 2:
+				seat_type += 'LB\t'
+			else:
+				seat_type += '\t'
 		for index, seat in enumerate(self.seats):
 			if self.seats[seat]:
 				seat_names.append(self.seats[seat].name)
 				seat_balances.append(str(self.seats[seat].balance))
 			else:
-				seat_names.append('---')
+				seat_names.append('------')
 				seat_balances.append('0')
-		print '\t'.join(str(self.seats.keys()))
+		#print '\t'.join(str(self.seats.keys()))
+		print seat_number
+		print seat_type
 		print '\t'.join(seat_names)
 		print '\t'.join(seat_balances)
 
