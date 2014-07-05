@@ -14,6 +14,7 @@ class Table(object):
 		self.state = state
 		self.pot = 0
 		self.cards = cards
+		self.round = 1
 		self.seats = {} # Dictionary of player locations
 		for i in range(self.positions):
 			self.seats[i] = None
@@ -25,6 +26,26 @@ class Table(object):
 				open_seats.append(i)
 		return 'Open seats at the following positions:\n%s' % open_seats
 
+	def display(self):
+		print 'Table Status'
+		print '-'*60
+		print 'Round: %d \t Pot: %d \t' % (self.round, self.pot)
+		print '='*60
+		seat_names = []
+		seat_balances = []
+
+		for index, seat in enumerate(self.seats):
+			if self.seats[seat]:
+				seat_names.append(self.seats[seat].name)
+				seat_balances.append(str(self.seats[seat].balance))
+			else:
+				seat_names.append('---')
+				seat_balances.append('0')
+		print '\t'.join(str(self.seats.keys()))
+		print '\t'.join(seat_names)
+		print '\t'.join(seat_balances)
+
+
 class Player(object):
 	"""Player (PC/NPC) parent class. Contains properties that are common to 
 	both PC/NPC players. 
@@ -33,22 +54,25 @@ class Player(object):
 	def __init__(self, name, balance=100):
 		self.name = name
 		self.balance = balance
+		self.sitting_out = True
 
 	def sit_in(self, table, seat):
 		table.seats[seat] = self
+		self.sitting_out = False
 
 class NPC(Player):
 	"""Subclass of Player. Needs to make basic decisions
 	based on ratios, does not use input, performs actions
 	based on code-only"""
-
+	def __init__(self, name):
+		Player.__init__(self, name)
 class PC(Player):
 	"""Subclass of Player. Player is a human player, and needs to be presented 
 	with each decision and perform that action using some type of input.
 	"""
 	def __init__(self, name):
-		self.sitting_out = False
-		self.name = name
+		Player.__init__(self, name) 
+		
 		
 class Card(object):
 	"""Individual playing card"""
