@@ -23,7 +23,8 @@ class Table(object):
 	def deal(self):
 		for seat in self.seats:
 			if self.seats[seat] == None:
-				print 'Skipping seat: %d' % seat
+				pass
+				#print 'Skipping seat: %d' % seat
 			else:
 				self.seats[seat].cards.append(self.cards.pop())
 				self.seats[seat].cards.append(self.cards.pop())
@@ -114,13 +115,14 @@ class Player(object):
 		self.sitting_out = False
 
 class NPC(Player):
-	"""Subclass of Player. Needs to make basic decisions
+	"""Subclass of Player. NPC (Non-Player Character) is a computer player.
+	Needs to make basic decisions
 	based on ratios, does not use input, performs actions
 	based on code-only"""
 	def __init__(self, name):
 		Player.__init__(self, name)
 class PC(Player):
-	"""Subclass of Player. Player is a human player, and needs to be presented 
+	"""Subclass of Player. PC (Player Character) is a human player, and needs to be presented 
 	with each decision and perform that action using some type of input.
 	"""
 	def __init__(self, name):
@@ -173,6 +175,9 @@ class Card(object):
 class Deck(object):
 	"""Standard deck of playing cards"""
 	def __init__(self):
+		"""
+		When a deck is created, create and append cards to the card_list
+		"""
 		self.suits = ['D', 'H', 'C', 'S']
 		self.ranks = [1,2,3,4,5,6,7,8,9,10,11,12,13] 
 		
