@@ -29,10 +29,9 @@ class Table(object):
 		if self.bet_level == 1:
 			return self.bet_level * self.min_bet * 1
 		elif self.bet_level > 1:
-			return 2 * self.min_bet * 1
+			return 2 * self.min_bet * 1			
 	def get_raise_amt(self):
 		return 2 * self.get_bet_amt()
-
 	def deal_players(self, n, state):
 		self.state = state
 		for seat in self.seats:
@@ -43,19 +42,16 @@ class Table(object):
 				for i in range(n):
 					self.seats[seat].cards.append(self.cards.pop())
 					self.seats[seat].inhand = True
-
 	def deal_common(self, n, state):
 		self.state = state
 		for i in range(n):
 			self.common_cards.append(self.cards.pop())
-
 	def display_open_seats(self):
 		open_seats = []
 		for i in self.seats:
 			if self.seats[i] == None:
 				open_seats.append(i)
 		return 'Open seats at the following positions:\n%s' % open_seats
-
 	def seat_math(self, position, change):
 		"""Given a position, and the change in position returns 
 		a new position at the table. Needed to go around the table.
@@ -70,27 +66,48 @@ class Table(object):
 			return max_pos + 1 + pos_new
 		else:
 			return pos_new
-
-	def betting_round(self):
-		current_pos = self.seat_math(self.dealer_pos, 1)
-		# current = self.seats[current_pos]
-		# while current == None:
-		# 	current_pos = self.seat_math(current_pos, 1)
-		# 	current = self.seats[current_pos]
-		# while current.inhand and current.taken_turn == False:
-		# 	if current.type == 'NPC':
-		# 		current.take_action(self, current.get_options(self)[0]) 
-		# 	else:
-		# 		print current.get_options(self)
-		# 		action = raw_input('Enter your action')
-		# 		current.take_action(self, action)
+	def reset_betting(self):
 		for seat in self.seats:
-			if self.seats[current] and current.inhand and current.taken_turn = False: # If a player in the seat
-				print 'ok'
-			else:
-				print 'not ok'
-
-
+			player = self.seats[seat]
+			if player:
+				player.bet_this_hand = 0
+				player.taken_turn = False
+				if player.sitting_out or player.balance <= 0:
+					player.inhand=False
+				else:
+					player.inhand=True
+	def betting_round(self):
+		self.reset_betting()
+		current_pos = self.seat_math(self.dealer_pos, 1)
+		while not self.betting_over():
+			current = self.seats[current_pos]
+			while current == None:
+				current_pos = self.seat_math(current_pos, 1)
+				current = self.seats[current_pos]
+			while current.inhand and current.balance >= 0:
+				if current.type == 'NPC':
+					current.take_action(self, current.get_options(self)[0]) 
+				else:
+					print current.get_options(self)
+					action = raw_input('Enter your action')
+					current.take_action(self, action)
+	def betting_over(self):
+		max_bet_level = 0
+		for seat in self.seats:
+			player = self.seats[seat]
+			if player:
+				#Betting would be over if all player bets match
+				if player.bet_this_hand >= max_bet_level:
+					max_bet_level = player.bet_this_hand
+					return False
+		for seat in self.seats:
+			player = self.seats[seat]
+			if player:
+				#Betting would be over if all player bets match
+				if player.bet_this_hand <> max_bet_level:
+					return False
+		return True
+		
 	def display(self):
 		print 'Table Status: %s' % self.state
 		print '-'*63
@@ -145,7 +162,6 @@ class Table(object):
 		print '\t'.join(seat_balances)
 		print '\t'.join(seat_cards)
 
-
 class Player(object):
 	"""Player (PC/NPC) parent class. Contains properties that are common to 
 	both PC/NPC players. 
@@ -158,6 +174,7 @@ class Player(object):
 		self.cards = []
 		self.inhand = False
 		self.taken_turn = False
+		self.bet_this_hand = 0
 
 	def sit_in(self, table, seat):
 		table.seats[seat] = self
@@ -177,17 +194,20 @@ class Player(object):
 			self.inhand = True
 			bet_amt = table.get_bet_amt()
 			self.balance -= bet_amt
+			self.bet_this_hand += bet_amt
 			table.pot += bet_amt
 			table.current_bet = bet_amt
 		elif action == 'Call':
 			self.taken_turn = True
 			self.inhand = True
 			self.balance -= table.current_bet
+			self.bet_this_hand += table.current_bet
 			table.pot += table.current_bet
 		elif action == 'Raise':
 			self.taken_turn = True
 			self.inhand = True
 			raise_amt = table.get_raise_amt()
+			self.bet_this_hand += raise_amt
 			self.balance -= raise_amt
 			table.pot += raise_amt
 			table.current_bet = raise_amt
