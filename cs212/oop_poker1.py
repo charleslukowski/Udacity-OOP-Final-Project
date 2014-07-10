@@ -84,29 +84,34 @@ class Table(object):
 			while current == None:
 				current_pos = self.seat_math(current_pos, 1)
 				current = self.seats[current_pos]
-			while current.inhand and current.balance >= 0:
-				if current.type == 'NPC':
-					current.take_action(self, current.get_options(self)[0]) 
-				else:
-					print current.get_options(self)
-					action = raw_input('Enter your action')
-					current.take_action(self, action)
+			if current:
+				while current.inhand and current.balance >= 0:
+					if current.type == 'NPC':
+						current.take_action(self, current.get_options(self)[0]) 
+					else:
+						print current.get_options(self)
+						action = raw_input('Enter your action')
+						current.take_action(self, action)
 	def betting_over(self):
 		max_bet_level = 0
 		for seat in self.seats:
 			player = self.seats[seat]
 			if player:
 				#Betting would be over if all player bets match
-				if player.bet_this_hand >= max_bet_level:
+				if player.bet_this_hand >= max_bet_level and player.taken_turn:
 					max_bet_level = player.bet_this_hand
-					return False
+					print 'Over'
+					return True
 		for seat in self.seats:
 			player = self.seats[seat]
 			if player:
 				#Betting would be over if all player bets match
 				if player.bet_this_hand <> max_bet_level:
+					print 'Still playing...'
 					return False
-		return True
+	
+		print 'Betting Over'
+		return False
 		
 	def display(self):
 		print 'Table Status: %s' % self.state
