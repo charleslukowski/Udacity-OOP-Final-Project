@@ -66,6 +66,7 @@ class Table(object):
         else:
             return pos_new
     def reset_betting(self):
+        self.bet_times = 0
         for seat in self.seats:
             player = self.seats[seat]
             if player:
@@ -256,7 +257,7 @@ class Player(object):
             self.inhand = False
 
     def get_options(self, table):
-        """Returns a list/dictionary (???) of options, based on
+        """Returns a list of options, based on
         status of the hand. If bets have been placed, and what
         level of betting the round is at.
         """
