@@ -82,22 +82,22 @@ class Table(object):
         print 'Betting Round Begins...'
         current_pos = self.seat_math(self.dealer_pos, 1)
         while not self.betting_over():
-            print 'Current: %s' % current_pos
+            #print 'Current: %s' % current_pos
             current = self.seats[current_pos]
             if current == None:
                 current_pos = self.seat_math(current_pos, 1)
                 current = self.seats[current_pos]
             if current:
-                print 'Player found at %s' % current_pos
+                #print 'Player found at %s' % current_pos
                 if current.inhand and current.balance >= 0:
-                    print 'Player is in the hand, and balance > 0'
+                    #print 'Player is in the hand, and balance > 0'
                     if current.type == 'NPC':
-                        print 'Player is an NPC'
+                        #print 'Player is an NPC'
                         current.take_action(self, current.get_options(self)[0])
                     else:
-                        print 'Player is human'
+                        #print 'Player is human'
                         print current.get_options(self)
-                        action = raw_input('Enter your action')
+                        action = raw_input('Enter your action>>> ')
                         current.take_action(self, action)
                         current_pos = self.seat_math(current_pos, 1)
                         current = self.seats[current_pos]
@@ -106,41 +106,41 @@ class Table(object):
         for seat in self.seats:
             player = self.seats[seat]
             if player:
-                print '='*20
-                print 'Testing Betting over'
-                print '='*20
-                print 'Player at Position: %s' % seat
-                print 'Player Name: %s' % player.name
-                print 'Player bet this hand: %s' % player.bet_this_hand
-                print 'Player taken turn?: %s' % player.taken_turn
-                print 'Max Bet Level: %s' % max_bet_level
+                # print '='*20
+                # print 'Testing Betting over'
+                # print '='*20
+                # print 'Player at Position: %s' % seat
+                # print 'Player Name: %s' % player.name
+                # print 'Player bet this hand: %s' % player.bet_this_hand
+                # print 'Player taken turn?: %s' % player.taken_turn
+                # print 'Max Bet Level: %s' % max_bet_level
                 #Betting would be over if all player bets match
                 if player.bet_this_hand >= max_bet_level and player.taken_turn:
                     max_bet_level = player.bet_this_hand
-                    print 'Player is above max bet level'
-                    print 'New Max Bet Level: %s' % max_bet_level
-        print 'Reviewed all players and max bet is: %s' % max_bet_level
-        print 'Now checking if all players bets match'
-        print '-'*20
+                    # print 'Player is above max bet level'
+                    # print 'New Max Bet Level: %s' % max_bet_level
+        # print 'Reviewed all players and max bet is: %s' % max_bet_level
+        # print 'Now checking if all players bets match'
+        # print '-'*20
         for seat in self.seats:
             player = self.seats[seat]
             if player:
                 #Betting would be over if all player bets match
-                print 'Player at Position: %s' % seat
-                print 'Player Name: %s' % player.name
-                print 'Player bet this hand: %s' % player.bet_this_hand
-                print 'Player taken turn?: %s' % player.taken_turn
-                print 'Max Bet Level: %s' % max_bet_level
+                # print 'Player at Position: %s' % seat
+                # print 'Player Name: %s' % player.name
+                # print 'Player bet this hand: %s' % player.bet_this_hand
+                # print 'Player taken turn?: %s' % player.taken_turn
+                # print 'Max Bet Level: %s' % max_bet_level
                 if not player.taken_turn:
-                    print 'Player %s has not taken turn yet' % player.name
+                    # print 'Player %s has not taken turn yet' % player.name
                     return False
                 elif player.bet_this_hand <> max_bet_level and player.inhand:
-                    print 'Players bet does not match, and they are still in the hand'
-                    print 'Betting is not over...'
+                    # print 'Players bet does not match, and they are still in the hand'
+                    # print 'Betting is not over...'
                     return False
                 else:
-                    print 'Players bets match the max'
-                    #print 'Betting is complete'
+                    # print 'Players bets match the max'
+                    pass
         return True
 
 
@@ -362,7 +362,9 @@ def main():
 
     t.deal_players(2, 'deal hole cards')
 
-    t.betting_round()
+    t.display()
+
+    t.betting_round() # Bet on hole cards
 
     t.display()
 
@@ -370,7 +372,7 @@ def main():
 
     t.display()
 
-    t.betting_round()
+    t.betting_round() # Bets on the flop
 
     t.display()
 
@@ -378,13 +380,13 @@ def main():
 
     t.display()
 
-    t.betting_round()
+    t.betting_round() # Bets on the turn
 
     t.deal_common(1, 'river')
 
     t.display()
 
-    t.betting_round()
+    t.betting_round() # Bets on the river
 
     t.display()
 
