@@ -199,6 +199,11 @@ class Table(object):
         print '\t'.join(seat_names)
         print '\t'.join(seat_balances)
         print '\t'.join(seat_cards)
+    def options_between_round(self):
+        """Ask each human player to sit in the next hand or not"""
+
+
+        #TODO
 
 class Player(object):
     """Player (PC/NPC) parent class. Contains properties that are common to
@@ -213,11 +218,9 @@ class Player(object):
         self.inhand = False
         self.taken_turn = False
         self.bet_this_hand = 0
-
     def sit_in(self, table, seat):
         table.seats[seat] = self
         self.sitting_out = False
-
     def take_action(self, table, action):
         """Perform either Check, Bet, Call, Raise, Fold within
         the context of the betting round
@@ -255,7 +258,6 @@ class Player(object):
         elif action == 'Fold':
             self.taken_turn = True
             self.inhand = False
-
     def get_options(self, table):
         """Returns a list of options, based on
         status of the hand. If bets have been placed, and what
@@ -269,8 +271,9 @@ class Player(object):
                 return ['Call', 'Raise', 'Fold']
             else:
                 return ['Call', 'Fold']
-
-
+    def sit_out(self, table, seat):
+        tables.seats[seat] = None
+        self.sitting_out = True
 class NPC(Player):
     """Subclass of Player. NPC (Non-Player Character) is a computer player.
     Needs to make basic decisions
@@ -286,7 +289,6 @@ class PC(Player):
     def __init__(self, name):
         Player.__init__(self, name)
         self.type = 'PC'
-
 class Card(object):
     """Individual playing card"""
     def __init__(self, suit, rank):
@@ -329,7 +331,6 @@ class Card(object):
 
     def simple_name_card(self, suit, rank):
         return self.rank_letters[rank] + suit
-
 class Deck(object):
     """Standard deck of playing cards"""
     def __init__(self):
