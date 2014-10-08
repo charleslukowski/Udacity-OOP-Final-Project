@@ -39,8 +39,9 @@ class Table(object):
                 #print 'Skipping seat: %d' % seat
             else:
                 for i in range(n):
-                    self.seats[seat].cards.append(self.cards.pop())
-                    self.seats[seat].inhand = True
+                    if self.seats[seat].sitting_out == False:
+                        self.seats[seat].cards.append(self.cards.pop())
+                        self.seats[seat].inhand = True
     def deal_common(self, n, state):
         self.state = state
         for i in range(n):
@@ -106,46 +107,22 @@ class Table(object):
         for seat in self.seats:
             player = self.seats[seat]
             if player:
-                # print '='*20
-                # print 'Testing Betting over'
-                # print '='*20
-                # print 'Player at Position: %s' % seat
-                # print 'Player Name: %s' % player.name
-                # print 'Player bet this hand: %s' % player.bet_this_hand
-                # print 'Player taken turn?: %s' % player.taken_turn
-                # print 'Max Bet Level: %s' % max_bet_level
-                #Betting would be over if all player bets match
-                if player.bet_this_hand >= max_bet_level and player.taken_turn:
-                    max_bet_level = player.bet_this_hand
-                    # print 'Player is above max bet level'
-                    # print 'New Max Bet Level: %s' % max_bet_level
-        # print 'Reviewed all players and max bet is: %s' % max_bet_level
-        # print 'Now checking if all players bets match'
-        # print '-'*20
+                if player.sitting_out == False:
+                    if player.bet_this_hand >= max_bet_level and player.taken_turn:
+                        max_bet_level = player.bet_this_hand
+
         for seat in self.seats:
             player = self.seats[seat]
             if player:
-                #Betting would be over if all player bets match
-                # print 'Player at Position: %s' % seat
-                # print 'Player Name: %s' % player.name
-                # print 'Player bet this hand: %s' % player.bet_this_hand
-                # print 'Player taken turn?: %s' % player.taken_turn
-                # print 'Max Bet Level: %s' % max_bet_level
-                if not player.taken_turn:
-                    # print 'Player %s has not taken turn yet' % player.name
-                    return False
-                elif player.bet_this_hand <> max_bet_level and player.inhand:
-                    # print 'Players bet does not match, and they are still in the hand'
-                    # print 'Betting is not over...'
-                    return False
-                else:
-                    # print 'Players bets match the max'
-                    pass
+                if player.sitting_out ==False:
+                    if not player.taken_turn:
+                        return False
+                    elif player.bet_this_hand <> max_bet_level and player.inhand:
+                        return False
+                    else:
+                        pass
         return True
 
-
-        print 'Betting Over'
-        return False
     def display(self):
         print 'Table Status: %s' % self.state
         print '-'*63
@@ -201,9 +178,17 @@ class Table(object):
         print '\t'.join(seat_cards)
     def options_between_round(self):
         """Ask each human player to sit in the next hand or not"""
-
-
-        #TODO
+        for seat in self.seats:
+            if self.seats[seat] == None:
+                pass
+            else:
+                print
+                print 'Sit in the next hand? [Yes, No]?'
+                ans = raw_input('>>>')
+                if ans == 'Yes':
+                    self.seats[seat].sit_out()
+                else:
+                    self.seats[seat].sitting_out = True
 
 class Player(object):
     """Player (PC/NPC) parent class. Contains properties that are common to
@@ -358,6 +343,8 @@ def main():
     p1.sit_in(t, 0)
     npc1 = NPC('NPC1')
     npc1.sit_in(t, 1)
+
+    t.options_between_round()
 
     t.display()
 
